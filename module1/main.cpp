@@ -110,6 +110,7 @@ void write_element(element* el) {
     cout << "first -- real: " << el->first.real << " imagine: " << el->first.imagine << "\n";
     cout << "second -- real: " << el->second.real << " imagine: " << el->second.imagine << "\n";
     cout << "value: " << count_value(el->first, el->second) << "\n";
+    cout << "key: " << el->key << "\n";
 }
 
 
@@ -120,26 +121,21 @@ List* create_empty_list() {
     return spysok;
 }
 
-element* add_element_list(element* next, complex z, complex w) {
-    element* el = new element;
-    el->first = z;
-    el->second = w;
-    el->next = next;
-    return el;
-}
 
-List* append_list(List* spysok, complex z, complex w) {
+List* append_list(List* spysok) {
     element* el;
     if(spysok->length == 0) {
-        el = add_element_list(nullptr, z, w);
+        el = create_random_element();
         spysok->root = el;
+        el->next = spysok->root;
     }
     else {
         element* curr = spysok->root;
-        while(curr->next != nullptr)
+        for(int i = 0; i < spysok->length; i++)
             curr = curr->next;
-        el = add_element_list(nullptr, z, w);
+        el = create_random_element();
         curr->next = el;
+        el->next = spysok->root;
     }
     spysok->length++;
     return spysok;
@@ -150,15 +146,62 @@ void print_all(List* spysok) {
     element* curr = spysok->root;
     for(int i = 0; i < length; i++) {
         write_element(curr);
-        curr= curr->next;
+        curr = curr->next;
     }
+}
+
+List* delete_and_create(List* spysok, int index, int count) {
+    element* curr = spysok->root;
+    for(int i = 0; i < index - 1; i++)
+        curr = curr->next;
+    for(int i = index - 1; i < index + count - 1; i++) {
+        element* tmp = curr->next;
+        curr->next = tmp->next;
+        delete(tmp);
+        spysok->length--;
+    }
+    for(int i = index - 1; i < index + (count / 4) - 1; i++) {
+        element* new_el = create_random_element();
+        new_el->next = curr->next->next;
+        curr->next = new_el;
+        spysok->length++;
+    }
+    return spysok;
+}
+
+List* transform_list(List* spysok) {
+    element* curr = spysok->root;
+    int deleted = 0;
+    int prev_dat = 0;
+    int curr_dat;
+    int index_prev = 0;
+    int index = 0;
+    for(int i = 0; i < 1000000000000000000; i++) {
+        curr_dat = curr->key - curr->next->key;
+        cout << curr_dat << " ";
+        cout << "\n";
+        cout << index << "\n";
+        if(curr_dat * prev_dat < 0)
+            index++;
+        else
+            index = 0;
+        if(index == 0 && index_prev >= 2) {
+            delete_and_create(spysok, i - index_prev, index_prev + 2);
+            deleted += index_prev;
+        }
+        index_prev = index;
+        prev_dat = curr_dat;
+        curr = curr->next;
+        if(deleted > 1321) return spysok;
+    }
+    return spysok;
 }
 
 int main() {
     List* spysok = create_empty_list();
-    element* el = create_random_element();
-    append_list(spysok, el->first, el->second);
-    append_list(spysok, el->first, el->second);
+    for(int i = 0;i < 10000; i++)
+        append_list(spysok);
+    transform_list(spysok);
     print_all(spysok);
     return 0;
 }
