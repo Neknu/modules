@@ -122,18 +122,15 @@ List* create_empty_list() {
 }
 
 
-List* append_list(List* spysok) {
-    element* el;
+List* append_list(List* spysok, element *el) {
     if(spysok->length == 0) {
-        el = create_random_element();
         spysok->root = el;
         el->next = spysok->root;
     }
     else {
         element* curr = spysok->root;
-        for(int i = 0; i < spysok->length; i++)
+        for(int i = 0; i < spysok->length - 1; i++)
             curr = curr->next;
-        el = create_random_element();
         curr->next = el;
         el->next = spysok->root;
     }
@@ -148,6 +145,18 @@ void print_all(List* spysok) {
         write_element(curr);
         curr = curr->next;
     }
+}
+
+element* peek(List* spysok) {
+    element* curr = spysok->root;
+    for(int i = 0; i < spysok->length - 1; i++)
+        curr = curr->next;
+    curr->next = spysok->root->next;
+    element* res = spysok->root;
+    delete(spysok->root);
+    spysok->root = curr->next;
+    spysok->length--;
+    return res;
 }
 
 List* delete_and_create(List* spysok, int index, int count) {
@@ -187,7 +196,7 @@ List* transform_list(List* spysok) {
             index = 0;
         if(index == 0 && index_prev >= 2) {
             delete_and_create(spysok, i - index_prev, index_prev + 2);
-            deleted += index_prev;
+            deleted += index_prev + 2;
         }
         index_prev = index;
         prev_dat = curr_dat;
@@ -197,11 +206,67 @@ List* transform_list(List* spysok) {
     return spysok;
 }
 
+List* convert_to_queue(List* spysok) {
+    List* queue = create_empty_list();
+    int length = spysok->length;
+    element* el;
+    for(int i = 0; i < length / 5; i++) {
+        element* curr = spysok->root;
+        el = new element;
+        el->next = nullptr;
+        el->key = curr->key;
+        el->second = curr->second;
+        el->first = curr->first;
+        append_list(queue, el);
+        peek(spysok);
+    }
+    print_all(queue);
+    cout << "\n";
+    print_all(spysok);
+    length = spysok->length;
+    for(int i = 0; i < length; i++) {
+        element* curr_spysok = spysok->root;
+        element* curr_queue = spysok->root;
+        element* rand = create_random_element();
+            if(rand->key % 3 == curr_spysok->key % 3 && rand->key % 3 != curr_queue->key % 3) {
+                el = new element;
+                el->next = nullptr;
+                el->key = curr_queue->key;
+                el->second = curr_queue->second;
+                el->first = curr_queue->first;
+                append_list(queue, el);
+            }
+            else
+        if(rand->key % 3 == curr_queue->key % 3 && rand->key % 3 != curr_spysok->key % 3) {
+            el = new element;
+            el->next = nullptr;
+            el->key = curr_spysok->key;
+            el->second = curr_spysok->second;
+            el->first = curr_spysok->first;
+            append_list(queue, el);
+        }
+        else{
+            append_list(queue, rand);
+        }
+        peek(queue);
+        peek(spysok);
+    }
+    return  queue;
+}
+
 int main() {
     List* spysok = create_empty_list();
-    for(int i = 0;i < 10000; i++)
-        append_list(spysok);
-    transform_list(spysok);
-    print_all(spysok);
+    for(int i = 0;i < 5000; i++)
+        append_list(spysok, create_random_element());
+   // print_all(spysok);
+
+    // this for 2nd task
+    // transform_list(spysok);
+
+    // this for 3d task
+     List* queue = convert_to_queue(spysok);
+     print_all(queue);
+     cout << "\n" << "\n";
+     print_all(spysok);
     return 0;
 }
