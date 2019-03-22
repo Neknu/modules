@@ -254,19 +254,61 @@ List* convert_to_queue(List* spysok) {
     return  queue;
 }
 
+struct square_list {
+    List* arr[RAND];
+    int length;
+};
+
+square_list* add_random_elements() {
+    square_list* square = new square_list;
+    square->length = 6;
+    for(int i =0; i < square->length; i ++) {
+        square->arr[i] = create_empty_list();
+        for(int j = 0;j < square->length; j++)
+            append_list(square->arr[i], create_random_element());
+        }
+    return square;
+}
+
+void print_square(square_list* square) {
+    for(int i = 0; i < square->length; i++) {
+        element* curr = square->arr[i]->root;
+        for (int j = 0; j < square->length; j++) {
+            write_element(curr);
+            curr = curr->next;
+        }
+    }
+}
+
+void find_element_in_square(square_list* square, element* el) {
+    for(int i = 0; i < square->length; i++) {
+        element* curr = square->arr[i]->root;
+        for (int j = 0; j < square->length; j++) {
+            if(curr->key == el->key)
+                cout << "i: " << i << " j: " << j << "\n";
+            curr = curr->next;
+        }
+    }
+}
+
 int main() {
     List* spysok = create_empty_list();
-    for(int i = 0;i < 5000; i++)
+    for(int i = 0;i < 500; i++)
         append_list(spysok, create_random_element());
-   // print_all(spysok);
+    print_all(spysok);
 
     // this for 2nd task
     // transform_list(spysok);
 
     // this for 3d task
-     List* queue = convert_to_queue(spysok);
-     print_all(queue);
-     cout << "\n" << "\n";
-     print_all(spysok);
+//     List* queue = convert_to_queue(spysok);
+//     print_all(queue);
+//     cout << "\n" << "\n";
+//     print_all(spysok);
+
+    // this for 4d task
+//    square_list* square = add_random_elements();
+//    find_element_in_square(square, create_random_element());
+//    print_square(square);
     return 0;
 }
