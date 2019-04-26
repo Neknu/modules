@@ -1,0 +1,3 @@
+D:/labsGit/modules/module1/cmake-build-debug/CMakeFiles/module1.dir
+D:/labsGit/modules/module1/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/labsGit/modules/module1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
