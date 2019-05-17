@@ -53,7 +53,7 @@ double mark(element* el) {
     for(int i = 0; i < el->count_func; i++) {
         res += el->functions[i].level*el->functions[i].level;
     }
-    res = pow(res, V + 2*el.rr);
+    res = pow(res, V + 2*el->rr);
     return res;
 }
 
@@ -80,6 +80,19 @@ element* create_random_element() {
     }
     el->rr = abs(rand_num(1));
     el->mark = mark(el);
+    return el;
+}
+
+void print_element(element* el) {
+    cout << endl;
+    cout << "type - " << el->type << "\n";
+    cout << "mark - " << el->mark << "\n";
+
+}
+
+void print_elements(element* components[]) {
+    for(int i = 0; i < COUNT; i++)
+        print_element(components[i]);
 }
 
 
@@ -91,5 +104,6 @@ int main() {
     for(int i = 0; i < COUNT; i++) {
         components[i] = create_random_element();
     }
+    print_elements(components);
     return 0;
 }
