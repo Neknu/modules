@@ -215,7 +215,7 @@ struct under_tree {
         length = 0;
         depth = 0;
         max = 0;
-        min = 0;
+        min = 1000000000;
         sum = 0;
     }
 };
@@ -252,6 +252,21 @@ element* add_new_son(Tree* tre, element* dad) {
     return new_son;
 }
 
+element* add_new_el(Tree* tre, element* dad, element* new_son) {
+    new_son->dad = dad;
+
+    if(!dad->son)
+        dad->son = new_son;
+    else {
+        element* curr = dad->son;
+        while(curr->next)
+            curr = curr->next;
+        curr->next = new_son;
+    }
+
+    return new_son;
+}
+
 void count_under_tree(under_tree* tre, element* root, int depth) {
     element* curr = root->son;
     while(curr) {
@@ -265,21 +280,60 @@ void count_under_tree(under_tree* tre, element* root, int depth) {
     }
 }
 
-void cout_under_tree(Tree* tre) {
+under_tree* create_under_tree(element* root) {
     under_tree* un_tre = new under_tree;
-    un_tre->root = tre->root->son;
+    un_tre->root = root;
     un_tre->depth = 1;
     un_tre->length = 1;
     un_tre->max = un_tre->root->mark;
     un_tre->min = un_tre->root->mark;
     un_tre->sum = un_tre->root->mark;
     count_under_tree(un_tre, un_tre->root, 1);
+    return un_tre;
+}
+
+void cout_under_tree(Tree* tre) {
+    under_tree* un_tre = create_under_tree(tre->root->son);
     cout << "this is information about tree->root->son: " << "\n";
     cout << "length - " << un_tre->length << "\n";
     cout << "depth - " << un_tre->depth << "\n";
     cout << "max - " << un_tre->max << "\n";
     cout << "min - " << un_tre->min << "\n";
     cout << "sum / length - " << un_tre->sum / un_tre->length << "\n";
+}
+
+void transfer_under_tree(Tree* tre, under_tree* to_move, int level) {
+    element* curr = tre->root;
+    for(int i = 1; i < level; i++)
+        curr = curr->son;
+    element* mem = curr;
+    double minim = 1000000000;
+    int k = 0;
+    int ans = 0;
+    under_tree* un_tre;
+    while(curr->next) {
+        un_tre = create_under_tree(curr);
+        minim = std::min(minim, un_tre->sum / un_tre->length);
+        if(un_tre->sum / un_tre->length < minim) {
+            minim = un_tre->length;
+            ans = k;
+        }
+        curr = curr->next;
+        k++;
+    }
+    k = 0;
+    curr = mem;
+    while(curr->next) {
+        if(ans == k) {
+            curr->son = to_move->root;
+            to_move->root->dad->son = to_move->root->next;
+            to_move->root->next = nullptr;
+            cout << "success!";
+        }
+        curr = curr->next;
+        k++;
+    }
+
 }
 
 void cout_path_to_node(element* curr, int depth) {
@@ -356,5 +410,8 @@ int main() {
     Tree* tre = create_random_tree();
     print_tree_rekurs(tre, tre->root, 1);
     cout_under_tree(tre);
+    under_tree* un_tre = create_under_tree(tre->root->son);
+    transfer_under_tree(tre, un_tre, 3);
+    print_tree_rekurs(tre, tre->root, 1);
     return 0;
 }
