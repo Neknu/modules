@@ -4,6 +4,7 @@
 #include <random>
 #include <chrono>
 #include <functional>
+#include <algorithm>
 
 int const V = 1;
 int const COUNT = 127;
@@ -18,9 +19,9 @@ double rand_num(double max) {
     static std::random_device rd;
     static std::seed_seq seed { rd(), static_cast<unsigned int>(time(nullptr))};
     static std::mt19937_64 gen(seed);
-    std::uniform_real_distribution<double> dist(-max, max);
+    std::uniform_real_distribution<double> dstnc(-max, max);
 
-    return dist(gen);
+    return dstnc(gen);
 }
 
 
@@ -35,18 +36,81 @@ struct element {
     int count_func;
     func functions[5 + V];
     double rr;
-    int mark;
+    double mark;
 
     element* dad;
     element* son;
     element* next; //brother
 };
 
-struct dist {
-    int distance;
-    int first_id;
-    int second_id;
+struct dstnc {
+    double distance; //distnce between 2 components
+    double first_mark;
+    double second_mark;
 };
+
+//sort for components
+int partition (element* arr[], int low, int high)
+{
+    int pivot = arr[high]->mark;
+    int i = (low - 1);
+
+    for (int j = low; j <= high- 1; j++)
+    {
+
+        if (arr[j]->mark <= pivot)
+        {
+            i++;
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[high]);
+    return (i + 1);
+}
+
+void quickSort(element* arr[], int low, int high)
+{
+    if (low < high)
+    {
+
+        int pi = partition(arr, low, high);
+
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+
+//sort for distances
+int partition (dstnc* arr[], int low, int high)
+{
+    double pivot = arr[high]->distance;
+    int i = (low - 1);
+
+    for (int j = low; j <= high- 1; j++)
+    {
+
+        if (arr[j]->distance <= pivot)
+        {
+            i++;
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[high]);
+    return (i + 1);
+}
+
+void quickSort(dstnc* arr[], int low, int high)
+{
+    if (low < high)
+    {
+
+        int pi = partition(arr, low, high);
+
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
 
 double mark(element* el) {
     double res = 0;
@@ -69,13 +133,27 @@ double dist(element* el, element* other) {
     return res;
 }
 
+int create_distances(element* components[], struct dstnc* distances[], int count) {
+    int k = 0;
+    for(int i = 0; i < count; i++)
+        for(int j = i + 1; j < count; j++) {
+            dstnc* d = new dstnc;
+            d->distance = dist(components[i], components[j]);
+            d->first_mark = components[i]->mark;
+            d->second_mark = components[j]->mark;
+            distances[k] = d;
+            k++;
+        }
+    return k;
+}
+
 element* create_random_element() {
     element* el = new element;
-    el->type = char(60+int(rand_num(10)));
+    el->type = char(75+int(rand_num(10)));
     el->id = int(rand_num(10)) + 10;
     el->count_func = abs(int(rand_num(5+V)));
     for(int i = 0; i < el->count_func; i++) {
-        el->functions[i].name =char(60+int(rand_num(5)));
+        el->functions[i].name =char(75+int(rand_num(5)));
         el->functions[i].level = abs(int(rand_num(1000))) + 1;
     }
     el->rr = abs(rand_num(1));
@@ -90,20 +168,41 @@ void print_element(element* el) {
 
 }
 
-void print_elements(element* components[]) {
-    for(int i = 0; i < COUNT; i++)
+void print_elements(element* components[], int count) {
+    for(int i = 0; i < count; i++)
         print_element(components[i]);
+}
+
+void print_distance(struct dstnc* d) {
+    cout << endl;
+    cout << "distance - " << d->distance << "\n";
+    cout << "first_mark - " << d->first_mark << "\n";
+    cout << "second_mark - " << d->second_mark << "\n";
+}
+
+void print_distances(struct dstnc* distances[], int start, int end) {
+    for(int i = start; i < end; i++)
+        print_distance(distances[i]);
 }
 
 
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
     element* components[COUNT + 1];
-    struct dist distances[COUNT*COUNT + 1];
+    struct dstnc* distances[COUNT*COUNT + 1];
+
     for(int i = 0; i < COUNT; i++) {
         components[i] = create_random_element();
     }
-    print_elements(components);
+
+    //this is for task one
+//    quickSort(components, 0, COUNT - 1);
+//    int count_dist;
+//    count_dist = create_distances(components, distances, 126);
+//    quickSort(distances, 0, count_dist - 1);
+//    print_distances(distances, 0, 12);
+//    print_distances(distances, count_dist - 12, count_dist);
+
+    print_elements(components, COUNT);
     return 0;
 }
