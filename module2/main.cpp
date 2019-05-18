@@ -8,6 +8,7 @@
 
 int const V = 1;
 int const COUNT = 127;
+int const KOL = 40;
 
 using std::string;
 using std::cin;
@@ -384,7 +385,10 @@ Tree* create_random_tree() {
 
 //task 3
 
+void print_graph(int matrix[[]], int kol) {
+    for(int i = 0;)
 
+}
 
 
 int main() {
@@ -407,11 +411,25 @@ int main() {
 //    print_elements(components, COUNT);
 
     // task 2
-    Tree* tre = create_random_tree();
-    print_tree_rekurs(tre, tre->root, 1);
-    cout_under_tree(tre);
-    under_tree* un_tre = create_under_tree(tre->root->son);
-    transfer_under_tree(tre, un_tre, 3);
-    print_tree_rekurs(tre, tre->root, 1);
+//    Tree* tre = create_random_tree();
+//    print_tree_rekurs(tre, tre->root, 1);
+//    cout_under_tree(tre);
+//    under_tree* un_tre = create_under_tree(tre->root->son);
+//    transfer_under_tree(tre, un_tre, 3);
+//    print_tree_rekurs(tre, tre->root, 1);
+
+    // task 3
+    for(int i = 0; i < KOL; i++) {
+        components[i] = create_random_element();
+    }
+    int matrix[KOL][KOL] = {0};
+    cout << "enter distance for adding edges" << "\n";
+    double distance;
+    cin >> distance;
+    for(int i = 0; i < KOL; i++)
+        for(int j = 0; j < KOL; j++)
+            if(dist(components[i], components[j]) < distance)
+                matrix[i][j] = int(dist(components[i], components[j])*1000);
+
     return 0;
 }
