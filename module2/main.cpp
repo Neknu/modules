@@ -43,6 +43,8 @@ struct element {
     element* next; //brother
 };
 
+//task one
+
 struct dstnc {
     double distance; //distnce between 2 components
     double first_mark;
@@ -161,6 +163,8 @@ element* create_random_element() {
     return el;
 }
 
+
+
 void print_element(element* el) {
     cout << endl;
     cout << "type - " << el->type << "\n";
@@ -187,22 +191,170 @@ void print_distances(struct dstnc* distances[], int start, int end) {
 
 
 
-int main() {
-    element* components[COUNT + 1];
-    struct dstnc* distances[COUNT*COUNT + 1];
 
-    for(int i = 0; i < COUNT; i++) {
-        components[i] = create_random_element();
+//task 2
+
+struct Tree {
+    element* root;
+    int length;
+    Tree() {
+        length = 0;
+        root = nullptr;
+    }
+};
+
+struct under_tree {
+    element* root;
+    int length;
+    int depth;
+    double max;
+    double min;
+    double sum;
+    under_tree() {
+        root = nullptr;
+        length = 0;
+        depth = 0;
+        max = 0;
+        min = 0;
+        sum = 0;
+    }
+};
+
+
+Tree* create_empty_tree() {
+    Tree* tre = new Tree;
+    return tre;
+}
+
+Tree* add_root(Tree* tre) {
+    element* root = create_random_element();
+    tre->length = 1;
+    tre->root = root;
+
+    return tre;
+}
+
+element* add_new_son(Tree* tre, element* dad) {
+    element* new_son = create_random_element();
+    new_son->dad = dad;
+
+    if(!dad->son)
+        dad->son = new_son;
+    else {
+        element* curr = dad->son;
+        while(curr->next)
+                curr = curr->next;
+        curr->next = new_son;
     }
 
+    tre->length++;
+
+    return new_son;
+}
+
+void count_under_tree(under_tree* tre, element* root, int depth) {
+    element* curr = root->son;
+    while(curr) {
+        tre->length++;
+        tre->depth = std::max(tre->depth, depth);
+        tre->max = std::max(tre->max, curr->mark);
+        tre->min = std::min(tre->min, curr->mark);
+        tre->sum += curr->mark;
+        count_under_tree(tre, curr, depth + 1);
+        curr = curr->next;
+    }
+}
+
+void cout_under_tree(Tree* tre) {
+    under_tree* un_tre = new under_tree;
+    un_tre->root = tre->root->son;
+    un_tre->depth = 1;
+    un_tre->length = 1;
+    un_tre->max = un_tre->root->mark;
+    un_tre->min = un_tre->root->mark;
+    un_tre->sum = un_tre->root->mark;
+    count_under_tree(un_tre, un_tre->root, 1);
+    cout << "this is information about tree->root->son: " << "\n";
+    cout << "length - " << un_tre->length << "\n";
+    cout << "depth - " << un_tre->depth << "\n";
+    cout << "max - " << un_tre->max << "\n";
+    cout << "min - " << un_tre->min << "\n";
+    cout << "sum / length - " << un_tre->sum / un_tre->length << "\n";
+}
+
+void cout_path_to_node(element* curr, int depth) {
+    for(int i = 0; i < depth; i++)
+        cout << " ---- ";
+    cout << curr->mark << endl;
+}
+
+void print_tree_rekurs(Tree* tre, element* root, int depth) {
+    element* curr = root->son;
+    while(curr) {
+        print_tree_rekurs(tre, curr, depth + 1);
+        curr = curr->next;
+    }
+    cout_path_to_node(root, depth);
+}
+
+
+Tree* create_random_tree() {
+    Tree* tre = create_empty_tree();
+    add_root(tre);
+    while(tre->length < 40) {
+        int random_count = abs(int(rand_num(5))) + 1;
+        for(int i = 0; i < random_count; i++)
+            add_new_son(tre, tre->root);
+        random_count = abs(int(rand_num(10))) + 1;
+        int j = 0;
+        element* curr = tre->root->son;
+        while(j < random_count && curr->next) {
+            add_new_son(tre, curr);
+            curr = curr->next;
+            j++;
+        }
+        random_count = abs(int(rand_num(10))) + 1;
+        j = 0;
+        curr = tre->root->son->son;
+        while(j < random_count && curr->next) {
+            add_new_son(tre, curr);
+            curr= curr->next;
+            j++;
+        }
+    }
+    return tre;
+}
+
+
+
+
+//task 3
+
+
+
+
+int main() {
+    element* components[COUNT + 1];
+
+
+
     //this is for task one
+
+   // struct dstnc* distances[COUNT*COUNT + 1];
+//    for(int i = 0; i < COUNT; i++) {
+//        components[i] = create_random_element();
+//    }
 //    quickSort(components, 0, COUNT - 1);
 //    int count_dist;
 //    count_dist = create_distances(components, distances, 126);
 //    quickSort(distances, 0, count_dist - 1);
 //    print_distances(distances, 0, 12);
 //    print_distances(distances, count_dist - 12, count_dist);
+//    print_elements(components, COUNT);
 
-    print_elements(components, COUNT);
+    // task 2
+    Tree* tre = create_random_tree();
+    print_tree_rekurs(tre, tre->root, 1);
+    cout_under_tree(tre);
     return 0;
 }
