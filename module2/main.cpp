@@ -389,8 +389,13 @@ Tree* create_random_tree() {
 struct graph {
     int count;
     double matrix[KOL][KOL];
+    int visited[2*KOL];
     graph() {
-        matrix[KOL][KOL] = {0};
+        for(int i = 0; i < KOL; i++)
+            for(int j = 0; j < KOL; j++)
+                matrix[i][j] = 0;
+        for(int i = 0; i < 2*KOL; i++)
+            visited[i] = 0;
         count = 0;
     }
 };
@@ -401,8 +406,8 @@ graph* build_graph(element* components[], double distance, int count) {
     for(int i = 0; i < count; i++)
         for(int j = 0; j < count; j++)
             if(i != j)
-            if(dist(components[i], components[j]) < distance)
-                gr->matrix[i][j] = dist(components[i], components[j])*1000;
+            if(log(1 / dist(components[i], components[j])) < distance)
+                gr->matrix[i][j] = int(log(1/dist(components[i], components[j])));
     return gr;
 }
 
@@ -414,8 +419,45 @@ void print_graph(graph* gr) {
             cout << " " << j;
         cout << endl;
     }
+}
+
+void BFS(graph* gr, int num, int start) {
+        int queue[KOL];
+        queue[0] = start;
+        int head = 0;
+        int tail = 1;
+        while (head != tail) {
+            int curr = queue[head];
+            gr->visited[curr] = num;
+            head++;
+            for (int i = 0; i < gr->count; i++) {
+                if (gr->matrix[curr][i] > 0 && !gr->visited[i]) {
+                    queue[tail] = i;
+                    tail++;
+                }
+            }
+        }
+}
 
 
+void BFS_components(graph* gr) {
+    int num = 0;
+    for(int i = 0; i < gr->count; i++)
+        if(!gr->visited[i]) {
+            num++;
+            BFS(gr, num, i);
+        }
+    for(int i = 0; i < gr->count; i++)
+        cout << gr->visited[i] << " ";
+    cout << "there are " << num << " components!" << "\n";
+}
+
+void print_matrix(graph* gr) {
+    for(int i = 0; i < gr->count; i++) {
+        for (int j = 0; j < gr->count; j++)
+            cout << gr->matrix[i][j] << " ";
+        cout << endl;
+    }
 }
 
 
@@ -450,11 +492,13 @@ int main() {
     for(int i = 0; i < KOL; i++) {
         components[i] = create_random_element();
     }
-    cout << "enter distance for adding edges" << "\n";
+    cout << "enter distance for adding edges (advise to use 100)" << "\n";
     double distance;
-    cin >> distance;
+    cin >> distance; // my advise to use 100
     graph* gr = build_graph(components, distance, KOL);
     print_graph(gr);
+ // //  print_matrix(gr);
+    BFS_components(gr);
 
     return 0;
 }
