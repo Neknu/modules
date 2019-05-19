@@ -577,17 +577,17 @@ int main() {
 
     //this is for task one
 
-   // struct dstnc* distances[COUNT*COUNT + 1];
-//    for(int i = 0; i < COUNT; i++) {
-//        components[i] = create_random_element();
-//    }
-//    quickSort(components, 0, COUNT - 1);
-//    int count_dist;
-//    count_dist = create_distances(components, distances, 126);
-//    quickSort(distances, 0, count_dist - 1);
-//    print_distances(distances, 0, 12);
-//    print_distances(distances, count_dist - 12, count_dist);
-//    print_elements(components, COUNT);
+    struct dstnc* distances[COUNT*COUNT + 1];
+    for(int i = 0; i < COUNT; i++) {
+        components[i] = create_random_element();
+    }
+    quickSort(components, 0, COUNT - 1);
+    int count_dist;
+    count_dist = create_distances(components, distances, 126);
+    quickSort(distances, 0, count_dist - 1);
+    print_distances(distances, 0, 12);
+    print_distances(distances, count_dist - 12, count_dist);
+    print_elements(components, COUNT);
 
     // task 2
 //    Tree* tre = create_random_tree();
