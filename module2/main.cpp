@@ -9,6 +9,7 @@
 int const V = 1;
 int const COUNT = 127;
 int const KOL = 40;
+int const INF = 1000000000;
 
 using std::string;
 using std::cin;
@@ -389,13 +390,16 @@ Tree* create_random_tree() {
 struct graph {
     int count;
     double matrix[KOL][KOL];
-    int visited[2*KOL];
+    int visited[2*KOL]; // for BFS
+    int done[2*KOL]; // for Djkstra
     graph() {
         for(int i = 0; i < KOL; i++)
             for(int j = 0; j < KOL; j++)
                 matrix[i][j] = 0;
         for(int i = 0; i < 2*KOL; i++)
             visited[i] = 0;
+        for(int i = 0; i < 2*KOL; i++)
+            done[i] = 0;
         count = 0;
     }
 };
@@ -422,7 +426,7 @@ void print_graph(graph* gr) {
 }
 
 void BFS(graph* gr, int num, int start) {
-        int queue[KOL];
+        int queue[KOL*KOL];
         queue[0] = start;
         int head = 0;
         int tail = 1;
@@ -447,9 +451,55 @@ void BFS_components(graph* gr) {
             num++;
             BFS(gr, num, i);
         }
-    for(int i = 0; i < gr->count; i++)
-        cout << gr->visited[i] << " ";
     cout << "there are " << num << " components!" << "\n";
+}
+
+int minDist(graph* gr, int curr) {
+    int len = INF;
+    int res = -1;
+    for(int i = 0; i < gr->count; i++)
+        if(gr->matrix[curr][i] > 0 && !gr->visited[i] && gr->matrix[curr][i] < len) {
+            len = gr->matrix[curr][i];
+            res = i;
+        }
+    return res;
+}
+
+void Djkstra(graph* gr, int start) {
+    for(int i = 0; i < gr->count; i++)
+        gr->visited[i] = 0;
+    int queue[2*KOL];
+    double distance[2*KOL];
+    for(int i = 0; i < gr->count; i++)
+        distance[i] = INF;
+    queue[0] = start;
+    distance[start] = 0;
+    int head = 0;
+    int tail = 1;
+    while(head != tail) {
+        int curr = queue[head];
+        if(gr->done[curr]) {
+            head++;
+            continue;
+        }
+        gr->done[curr] = true;
+        head++;
+        for(int i = 0; i < gr->count; i++)
+            gr->visited[i] = false;
+        int next = minDist(gr, curr);
+        while(next != -1) {
+            gr->visited[next] = true;
+            if(!gr->done[next] && distance[curr] + gr->matrix[curr][next] < distance[next]) {
+                queue[tail] = next;
+                distance[next] = distance[curr] + gr->matrix[curr][next];
+                tail++;
+            }
+            next = minDist(gr, curr);
+        }
+    }
+    cout << "this is distances from vertex " << start << " to another" << "\n";
+    for(int i = 0; i < gr->count; i++)
+        cout << distance[i] << " ";
 }
 
 void print_matrix(graph* gr) {
@@ -489,16 +539,19 @@ int main() {
 //    print_tree_rekurs(tre, tre->root, 1);
 
     // task 3
-    for(int i = 0; i < KOL; i++) {
-        components[i] = create_random_element();
-    }
-    cout << "enter distance for adding edges (advise to use 100)" << "\n";
-    double distance;
-    cin >> distance; // my advise to use 100
-    graph* gr = build_graph(components, distance, KOL);
-    print_graph(gr);
- // //  print_matrix(gr);
-    BFS_components(gr);
+//    for(int i = 0; i < KOL; i++) {
+//        components[i] = create_random_element();
+//    }
+//    cout << "enter distance for adding edges (advise to use 100)" << "\n";
+//    double distance;
+//    cin >> distance; // my advise to use 100KK
+//    graph* gr = build_graph(components, distance, KOL - 1);
+//    print_graph(gr);
+// //   print_matrix(gr);
+//    BFS_components(gr);
+//    Djkstra(gr, 1);
+
+    //task 4
 
     return 0;
 }
