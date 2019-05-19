@@ -51,6 +51,8 @@ struct dstnc {
     double distance; //distnce between 2 components
     double first_mark;
     double second_mark;
+    dstnc* left;
+    dstnc* right;
 };
 
 //sort for components
@@ -510,6 +512,63 @@ void print_matrix(graph* gr) {
     }
 }
 
+//task 4
+
+
+
+dstnc* newNode(double item) {
+    dstnc *temp =  new dstnc;
+    temp->distance = item;
+    temp->left = temp->right = nullptr;
+    return temp;
+}
+
+
+void printBinTree(struct dstnc *root, int depth) {
+    if (root != nullptr)
+    {
+        printBinTree(root->left, depth + 1);
+        for(int i = 0; i < depth; i++)
+            cout << " --";
+        cout << root->distance << "\n";
+        printBinTree(root->right, depth + 1);
+    }
+}
+
+
+dstnc* insert(dstnc* dstnc, double key) {
+
+    if (dstnc == nullptr) return newNode(key);
+
+    if (key < dstnc->distance)
+        dstnc->left  = insert(dstnc->left, key);
+    else if (key > dstnc->distance)
+        dstnc->right = insert(dstnc->right, key);
+
+    return dstnc;
+}
+
+dstnc* find(dstnc* dstnc, double key) {
+    while(dstnc) {
+        if(dstnc->distance == key)
+            return dstnc;
+        if(dstnc->distance > key)
+            dstnc = dstnc->right;
+        if(dstnc->distance < key)
+            dstnc = dstnc->left;
+    }
+    return nullptr;
+}
+
+
+dstnc* build_bin_tree(dstnc* distances[], int count_dist) {
+    dstnc *root = nullptr;
+    root = insert(root, distances[0]->distance);
+    for(int i = 0; i < count_dist; i++)
+        insert(root, distances[i]->distance);
+    printBinTree(root, 1);
+    return root;
+}
 
 int main() {
     element* components[COUNT + 1];
@@ -552,6 +611,19 @@ int main() {
 //    Djkstra(gr, 1);
 
     //task 4
+
+//    dstnc* distances[KOL*KOL + 1];
+//    for(int i = 0; i < KOL/4; i++) {
+//       components[i] = create_random_element();
+//    }
+//    int count_dist = create_distances(components, distances, KOL/4);
+//    dstnc* root = build_bin_tree(distances, count_dist);
+//
+//    dstnc* find_dist = find(root, distances[4]->distance);
+//    if(find_dist)
+//        cout << "this is data from finded node - " << find_dist->distance << "\n";
+//    else
+//        cout << "this node doesn't exist!" << "\n";
 
     return 0;
 }
