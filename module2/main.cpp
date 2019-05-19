@@ -385,8 +385,36 @@ Tree* create_random_tree() {
 
 //task 3
 
-void print_graph(int matrix[[]], int kol) {
-    for(int i = 0;)
+
+struct graph {
+    int count;
+    double matrix[KOL][KOL];
+    graph() {
+        matrix[KOL][KOL] = {0};
+        count = 0;
+    }
+};
+
+graph* build_graph(element* components[], double distance, int count) {
+    graph* gr = new graph;
+    gr->count = count;
+    for(int i = 0; i < count; i++)
+        for(int j = 0; j < count; j++)
+            if(i != j)
+            if(dist(components[i], components[j]) < distance)
+                gr->matrix[i][j] = dist(components[i], components[j])*1000;
+    return gr;
+}
+
+void print_graph(graph* gr) {
+    for(int i = 0; i < gr->count; i++) {
+        cout << "vertex - " << i << " - edges to - ";
+        for(int j = 0; j < gr->count; j++)
+            if(gr->matrix[i][j] > 0)
+            cout << " " << j;
+        cout << endl;
+    }
+
 
 }
 
@@ -422,14 +450,11 @@ int main() {
     for(int i = 0; i < KOL; i++) {
         components[i] = create_random_element();
     }
-    int matrix[KOL][KOL] = {0};
     cout << "enter distance for adding edges" << "\n";
     double distance;
     cin >> distance;
-    for(int i = 0; i < KOL; i++)
-        for(int j = 0; j < KOL; j++)
-            if(dist(components[i], components[j]) < distance)
-                matrix[i][j] = int(dist(components[i], components[j])*1000);
+    graph* gr = build_graph(components, distance, KOL);
+    print_graph(gr);
 
     return 0;
 }
